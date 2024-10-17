@@ -33,44 +33,476 @@
 
         gtag('config', 'G-TH6FWY4EDD');
     </script>
-<div>
-    <iframe
-      id="chatbot-iframe"
-      src="http://64.30.158.247/"
-      style="width: 90px; height: 50px; border: none; position: fixed; bottom: 8px; right: 0px; z-index: 800; transition: all 0.5s ease; border-radius: 70px;"
-    ></iframe>
-  
-    <script>
-      // Listen for messages from the iframe to expand or collapse
-      window.addEventListener("message", function(event) {
-        const iframe = document.getElementById("chatbot-iframe");
-  
-        if (event.data.action === "expand") {
-          // Expand the iframe to show the full chatbot
-          iframe.style.width = "336px";
-          iframe.style.height = "670px";
-          iframe.style.borderRadius = "10px"; // Adjust border-radius for the expanded state
-        } else if (event.data.action === "collapse") {
-          // Collapse the iframe to its initial small state
-          iframe.style.width = "90px";
-          iframe.style.height = "50px";
-          iframe.style.borderRadius = "70px"; // Reset border-radius for the collapsed state
-        }
-      });
-  
-      // Function to get query parameter value
-      function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-      }
-  
-      // Apply background color from the query parameter if provided
-      const bgColor = getQueryParam('bgColor');
-      if (bgColor) {
-        document.body.style.backgroundColor = bgColor;
-      }
-    </script>
+<style>* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: rgba(255, 255, 255, 0);
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+.chat-container {
+  width: 300px;
+  height: 600px;
+  background: linear-gradient(to bottom, #dc33a965, #3232fb65); /* Gradient background for the container */
+  border-radius: 20px;
+  display: none; /* Initially hidden */
+  backdrop-filter: blur(20px);
+  position: fixed; /* Fixed position */
+  bottom: 60px; /* Distance from the bottom */
+  right: 30px; /* Distance from the right */
+  flex-direction: column;
+  z-index: 0; /* Ensure chatbot is on top */
+}
+
+/* For Webkit browsers (Chrome, Safari) */
+.chat-container::-webkit-scrollbar {
+  width: 4px; /* Width of the scrollbar */
+}
+
+/* Hide the track */
+/* .chat-container::-webkit-scrollbar-track {
+  background: transparent; /* Set track background to transparent */
+
+
+/* Style the scrollbar thumb */
+.chat-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.6); /* Color of the scrollbar thumb */
+  border-radius: 100px; /* Make it pill-shaped with a higher border-radius */
+  height: 10px; /* Set a specific height for the thumb */
+  display: none;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.9); /* Color when hovering over the thumb */
+}
+
+/* For Firefox */
+.chat-container {
+  scrollbar-width: thin; /* Use 'thin' for a thinner scrollbar */
+  scrollbar-color: rgba(255, 255, 255, 0.6) transparent; /* Thumb color and track color (transparent) */
+}
+
+/* Optional: Ensure the height of the thumb in Firefox is similar */
+.chat-container::-moz-scrollbar-thumb {
+  border-radius: 20px; /* Pill shape for Firefox */
+  height: 30px; /* Set a specific height for the thumb */
+}
+
+
+
+.chat-logo {
+  width: 50px; /* Adjust the size */
+  height: auto;
+  position: absolute;
+  top: 10px; /* Position it inside the chat container */
+  left: 10px;
+  z-index: 10; /* Ensure it appears on top */
+}
+
+.chat-box {
+  flex-grow: 4;
+  padding: 30px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ec090900;
+  z-index: 1;
+}
+
+.chat-message {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+  color:  rgba(255, 255, 255, 0.9);
+  max-width: 80%;
+  clear: both; /* Clear floats */
+}
+
+.bot {
+  background: linear-gradient(to left, #dc33a980, #3232fb41); /* Gradient background for bot messages */
+  align-self: flex-end; /* Align bot messages to the right */
+  margin-right: auto; /* Push to right */
+}
+
+.user {
+  background: linear-gradient(to right, #dc33a980, #3232fb41); /* Gradient background for user messages */
+  align-self: flex-start; /* Align user messages to the left */
+  margin-left: auto; /* Push to right */
+}
+
+.chat-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 10px;
+}
+
+.option-button {
+  padding: 8px 15px; /* Smaller buttons */
+  font-size: 14px;
+  border: none;
+  background: linear-gradient(to right, #dc33a9b7, #3232fbb6); /* Gradient background for option buttons */
+  color:  rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  cursor: pointer;
+  margin: 5px 0;
+  width: auto;
+  text-align: left;
+  margin-left: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.option-button:hover {
+  background: linear-gradient(to left, #dc33a9, #3332fb); /* Reversed gradient on hover */
+}
+
+.chat-input {
+  padding: 10px;
+  display: flex;
+  border-top: 1px solid #00000000;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: #3232fb6e;
+  color:  rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.chat-input input::placeholder {
+  color: rgba(255, 255, 255, 0.7); /* Set the placeholder color (white with some transparency) */
+}
+
+.chat-input button {
+  padding: 10px 20px;
+  width: 88px;
+  height: 45px;
+  border: none;
+  background: linear-gradient(to right, #dc33a9b7, #3232fbb6); /* Gradient from #dc33a9 to #3332fb */
+  backdrop-filter: blur(20px);
+  color: white;
+  border-radius: 20px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background: linear-gradient(to right, #3332fb, #dc33a9); /* Gradient from #3332fb to #dc33a9 */
+}
+
+.toggle-chatbot {
+  padding: 15px 25px;
+  background: linear-gradient(to right, #dc33a9, #3332fb); /* Gradient from #dc33a9 to #3332fb */
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  position: fixed;
+  bottom: 0px; /* Adjusted distance from the bottom */
+  right: 0px; /* Distance from the right */
+  z-index: 1000; /* Ensure button is on top */
+  width: 90px; /* Increase the width */
+  height: 50px; /* Increase the height */
+}
+
+.toggle-chatbot:hover {
+  background: linear-gradient(to right, #3332fb, #dc33a9); /* Gradient from #3332fb to #dc33a9 */
+}</style>
+<button class="toggle-chatbot" onclick="toggleChatbot()">Chat</button>
+
+  <div class="chat-container" id="chat-container" style="display: none;">
+    <div class="chat-box" id="chat-box"></div>
+    <div class="chat-options" id="chat-options"></div>
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
+<script>const chatContainer = document.getElementById("chat-container");
+const chatBox = document.getElementById("chat-box");
+const chatOptions = document.getElementById("chat-options");
+const userInput = document.getElementById("user-input");
+
+// Initialize a variable to store the section ID
+// Initialize a variable to store the section ID
+let sectionId = "";
+
+// Function to generate a random section ID
+function generateSectionId() {
+  return 'section-' + Math.random().toString(36).substr(2, 9); // Generates a random alphanumeric ID
+}
+
+// Ensure section ID is generated when the chatbot opens
+function initializeChatbot() {
+  if (!sectionId) {
+    sectionId = generateSectionId(); // Generate and assign section ID
+    console.log("Section ID generated:", sectionId); // Debugging log
+  }
+}
+// Predefined bot responses with keywords
+const botResponses = {
+  "hi": {
+    "response": "Hi! Welcome to Terralogic, a global leader in IT solutions and digital transformation. How can I assist you today?",
+    "options": ["tell me about your services", "who are your clients?", "what are your achievements?"]
+  },
+  "hello": {
+    "response": "Hello! Welcome to Terralogic. How can I help you today?",
+    "options": ["tell me about your services", "who are your clients?", "what are your achievements?"]
+  },
+  "tell me about your services": {
+    "response": "We offer a wide range of services including Design, Application Development, IT Services, and Cybersecurity. Which one would you like to explore?",
+    "options": ["explore design services", "explore application development", "explore it services", "explore cybersecurity"]
+  },
+  "explore design services": {
+    "response": "Our design services cover UX Research, UI/UX Design, and Usability Testing. We’ve helped companies like Paytm and IMS with their digital transformation. What would you like to know more about?",
+    "options": ["learn about ux research", "learn about ui/ux design", "learn about usability testing"]
+  },
+  "learn about ux research": {
+    "response": "Our UX Research provides deep insights to optimize user experiences. We conduct Heuristic Analysis, Design Audits, and Usability Tests.",
+    "options": ["explore more services", "explore case studies"]
+  },
+  "learn about ui/ux design": {
+    "response": "We craft intuitive, user-centered designs that are scalable. From mobile apps to enterprise solutions, we design experiences users love.",
+    "options": ["explore more design services", "tell me about your clients"]
+  },
+  "learn about usability testing": {
+    "response": "We help improve product usability through rigorous testing to ensure a seamless user experience.",
+    "options": ["explore application development", "tell me about your achievements"]
+  },
+  "explore application development": {
+    "response": "Our application development covers mobile, web, and enterprise-level apps, utilizing cutting-edge technologies. What specific area interests you?",
+    "options": ["mobile app development", "web app development", "enterprise app development"]
+  },
+  "mobile app development": {
+    "response": "We build feature-rich, high-performance mobile apps tailored to your needs, for both Android and iOS platforms.",
+    "options": ["explore more about app development", "who are your mobile clients?"]
+  },
+  "web app development": {
+    "response": "Our web app solutions provide robust and scalable platforms for businesses, focusing on user experience and performance.",
+    "options": ["learn about custom web apps", "who are your clients?"]
+  },
+  "enterprise app development": {
+    "response": "We develop enterprise applications that streamline processes and increase efficiency. Our clients include Fortune 500 companies.",
+    "options": ["learn about saas solutions", "explore more services"]
+  },
+  "explore it services": {
+    "response": "We offer 24/7 IT support, managed services, and infrastructure outsourcing to help businesses stay agile and secure.",
+    "options": ["learn about managed services", "learn about cloud services", "learn about infrastructure outsourcing"]
+  },
+  "learn about managed services": {
+    "response": "Our managed services provide proactive support and monitoring, ensuring that your IT infrastructure is secure and efficient.",
+    "options": ["learn about cloud security", "explore more services"]
+  },
+  "learn about cloud services": {
+    "response": "We provide cloud hosting, DaaS, and cloud management services for businesses looking to modernize and scale their operations.",
+    "options": ["explore application hosting", "learn about cloud security"]
+  },
+  "learn about cloud security": {
+    "response": "We offer robust cloud security services that ensure your cloud infrastructure is protected from threats. This includes encryption, identity management, and real-time monitoring.",
+    "options": ["learn about data protection", "explore compliance services"]
+  },
+  "learn about infrastructure outsourcing": {
+    "response": "We offer infrastructure outsourcing, including network management and IT support, enabling businesses to focus on growth.",
+    "options": ["explore more it services", "learn about system integration"]
+  },
+  "explore cybersecurity": {
+    "response": "We provide cutting-edge cybersecurity solutions including Managed Detection, Threat Management, and Governance, Risk & Compliance.",
+    "options": ["learn about threat management", "learn about data protection", "learn about iot/ot security"]
+  },
+  "learn about threat management": {
+    "response": "Our threat management services provide proactive defense against cyber threats, using AI-driven tools and human expertise.",
+    "options": ["learn about vulnerability assessments", "explore more cybersecurity services"]
+  },
+  "learn about data protection": {
+    "response": "We ensure data privacy and protection with secure solutions for data at rest and in motion, ensuring compliance with global standards.",
+    "options": ["explore compliance services", "learn about iot/ot security"]
+  },
+  "learn about iot/ot security": {
+    "response": "We secure IoT and OT devices with real-time monitoring and threat mitigation to ensure the safety of interconnected systems.",
+    "options": ["explore cybersecurity solutions", "learn about managed services"]
+  },
+  "who are your clients?": {
+    "response": "We are proud to have worked with companies like Upstox, Paytm, IMS Mobile, and Trukkin, across industries like Fintech, Healthcare, and Agritech.",
+    "options": ["learn more about fintech clients", "learn more about healthcare clients", "tell me about your achievements"]
+  },
+  "learn more about fintech clients": {
+    "response": "In the Fintech space, we've partnered with companies like Paytm and Upstox to revolutionize digital finance platforms.",
+    "options": ["learn about fintech solutions", "explore more clients"]
+  },
+  "learn more about healthcare clients": {
+    "response": "We've developed solutions for the Healthcare industry, including telemedicine platforms and wellness apps.",
+    "options": ["learn about healthcare solutions", "explore more industries"]
+  },
+  "what are your achievements?": {
+    "response": "We have received several accolades, including the DNA Paris Design Award and A'Design Award. We’ve completed over 2400 projects across 16+ countries.",
+    "options": ["explore more achievements", "learn more about your services"]
+  },
+  "bye": {
+    "response": "Goodbye! We hope to assist you again soon. Have a great day!",
+    "options": []
+  }
+};
+
+
+// Function to add a message to the chat
+function addMessage(sender, text) {
+  const messageElement = document.createElement("div");
+  messageElement.classList.add("chat-message", sender);
+  messageElement.textContent = text;
+  chatBox.appendChild(messageElement);
+  scrollToBottom();
+}
+
+// Function to show button options for user to select
+function showOptions(options) {
+  chatOptions.innerHTML = ""; // Clear previous options
+  options.forEach(option => {
+    const button = document.createElement("button");
+    button.classList.add("option-button");
+    button.textContent = option;
+    button.onclick = () => handleOptionClick(option);
+    chatOptions.appendChild(button);
+  });
+}
+
+// Handle button click and bot reply
+function handleOptionClick(option) {
+  addMessage("user", option);
+  chatOptions.innerHTML = ""; // Hide options after user clicks one
+  botReply(option);
+}
+
+// Function to handle user-typed message
+function sendMessage() {
+  const userText = userInput.value.trim().toLowerCase();
+  if (userText === "") return;
+
+  addMessage("user", userText);
+  userInput.value = ""; // Clear input field
+
+  // Check for matches with keywords in botResponses
+  const matchedOptions = Object.keys(botResponses).filter(key => userText.includes(key));
+  if (matchedOptions.length > 0 && botResponses[matchedOptions[0]].response === ""){
+    makeHttpRequest(userText);
+    botReply(matchedOptions[0]);
+  }
+  else if (matchedOptions.length > 0 && botResponses[matchedOptions[0]].response !== "") {
+    // If there's a match, respond with the first match found
+    
+    botReply(matchedOptions[0]);
+  } else {
+    // If no matches, make an HTTP request
+    makeHttpRequest(userText);
+  }
+}
+
+// Handle pressing Enter key
+function handleKeyPress(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+}
+
+// Function to generate bot reply based on user input
+function botReply(userText) {
+  setTimeout(() => {
+    // Check for predefined responses
+    const botResponse = botResponses[userText];
+    
+
+    if (botResponse) {
+      if(botResponse.response !== "") addMessage("bot", botResponse.response);
+
+      // If there are options, show them
+      if (botResponse.options.length > 0) {
+        showOptions(botResponse.options);
+      }
+    } else {
+      addMessage("bot", "I didn't understand that. Could you please rephrase?");
+    }
+  }, 1000); // Simulate bot thinking time
+}
+
+// Function to make HTTP request for user input
+async function makeHttpRequest(userText) {
+  // Ensure section ID is generated
+  if (!sectionId) {
+    sectionId = generateSectionId(); // Generate and assign section ID if not already generated
+  }
+
+  try {
+    const response = await fetch('https://64.30.158.247/ask', { // Change to your API endpoint
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        user_input: userText,
+        section_id: sectionId, // Pass the section ID with the request
+        model_choice:"google"
+      })
+    });
+
+    // Check if the response is OK
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    // Convert the response to JSON
+    const data = await response.json();
+
+    // Access the 'response' property correctly
+    if (data.response) {
+      addMessage("bot", data.response); // Display the bot's response
+    } else {
+      addMessage("bot", "I did not get a valid response from the server.");
+    }
+  } catch (error) {
+    console.error('Error:', error); // Log the error for debugging
+    addMessage("bot", "Sorry, I could not reach the server. Please try again later.");
+  }
+}
+
+function scrollToBottom() {
+  const chatBox = document.getElementById("chat-container"); // Ensure you have the correct reference
+  chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+}
+
+function toggleChatbot() {
+  const chatContainer = document.getElementById("chat-container");
+
+  if (chatContainer.style.display === "none" || chatContainer.style.display === "") {
+    chatContainer.style.display = "flex"; // Show the chat container
+    parent.postMessage({ action: "expand" }, "*"); // Notify parent to expand iframe
+    
+    // Add the logo to the chat container if it's not already added
+    if (!chatContainer.querySelector(".chat-logo")) {
+      const logo = document.createElement("img");
+      logo.src = "https://terralogic.com/wp-content/themes/terralogic/img/brand-logo.svg"; // Update with the correct logo path
+      logo.alt = "Chatbot Logo";
+      logo.className = "chat-logo"; // Add a class for styling
+
+      chatContainer.insertBefore(logo, chatContainer.firstChild);
+    }
+  } else {
+    chatContainer.style.display = "none"; // Hide the chat container
+    parent.postMessage({ action: "collapse" }, "*"); // Notify parent to collapse iframe
+  }
+}
+
+// Event listener for Enter key
+userInput.addEventListener("keypress", handleKeyPress);</script>
 </body>
 <script type='text/javascript' id='leadin-script-loader-js-js-extra'>
 /* <![CDATA[ */
