@@ -1,82 +1,65 @@
 
 <!DOCTYPE html>
 <html lang="en-US">
-
-<head>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TH6FWY4EDD"></script>
-    <!-- Hotjar Tracking Code for https://terralogic.com/ -->
+    <body><div id="iframe-container">
     <script>
-        (function(h, o, t, j, a, r) {
-            h.hj = h.hj || function() {
-                (h.hj.q = h.hj.q || []).push(arguments)
-            };
-            h._hjSettings = {
-                hjid: 3624379,
-                hjsv: 6
-            };
-            a = o.getElementsByTagName('head')[0];
-            r = o.createElement('script');
-            r.async = 1;
-            r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-            a.appendChild(r);
-        })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
-    </script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
+        const iframeContainer = document.getElementById("iframe-container");
+        const iframeSrc = "https://chatbot.terralogic.com/lollypop_design";
 
-        function gtag() {
-            dataLayer.push(arguments);
+        // Function to check if the iframe source URL is reachable
+        function checkIframeSrc(url) {
+        return fetch(url, { method: 'HEAD' })
+            .then(response => response.ok)
+            .catch(() => false);
         }
-        gtag('js', new Date());
 
-        gtag('config', 'G-TH6FWY4EDD');
-    </script>
-<div>
-    <iframe
-      id="chatbot-iframe"
-      src="https://64.30.158.247/"
-      style="width: 90px; height: 50px; border: none; position: fixed; bottom: 8px; right: 0px; z-index: 800; transition: all 0.5s ease; border-radius: 70px;"
-    ></iframe>
-  
-    <script>
-      // Listen for messages from the iframe to expand or collapse
-      window.addEventListener("message", function(event) {
-        const iframe = document.getElementById("chatbot-iframe");
-  
-        if (event.data.action === "expand") {
-          // Expand the iframe to show the full chatbot
-          iframe.style.width = "336px";
-          iframe.style.height = "670px";
-          iframe.style.borderRadius = "10px"; // Adjust border-radius for the expanded state
-        } else if (event.data.action === "collapse") {
-          // Collapse the iframe to its initial small state
-          iframe.style.width = "90px";
-          iframe.style.height = "50px";
-          iframe.style.borderRadius = "70px"; // Reset border-radius for the collapsed state
+        // Check the URL before adding the iframe
+        checkIframeSrc(iframeSrc).then(isReachable => {
+        if (isReachable) {
+            // Create the iframe element if the URL is reachable
+            const iframe = document.createElement("iframe");
+            iframe.id = "chatbot-iframe";
+            iframe.src = iframeSrc;
+            iframe.style = "width: 90px; height: 60px; border: none; position: fixed; bottom: 30px; right: 25px; z-index: 800; border-radius: 10px;";
+            iframeContainer.appendChild(iframe);
+
+                  // Listen for messages from the iframe to expand or collapse
+            window.addEventListener("message", function(event) {
+            const iframe = document.getElementById("chatbot-iframe");
+    
+            if (event.data.action === "expand") {
+            // Expand the iframe to show the full chatbot
+            iframe.style.width = "336px";
+            iframe.style.height = "670px";
+            iframe.style.borderRadius = "10px"; // Adjust border-radius for the expanded state
+            iframe.style.transition =  "all 0s linear";
+            } else if (event.data.action === "collapse") {
+            // Collapse the iframe to its initial small state
+            iframe.style.width = "90px";
+            iframe.style.height = "60px";
+            iframe.style.borderRadius = "10px"; // Reset border-radius for the collapsed state
+            iframe.style.transition = " width 0s ease, height 0s ease, border-radius 0s ease";
+            iframe.style.transitionDelay = "0.5s";
+            }
+        });
+        } else {
+            console.error("Iframe source is not reachable. The iframe will not be displayed.");
         }
-      });
-  
-      // Function to get query parameter value
-      function getQueryParam(param) {
+        });
+
+        // Function to get query parameter value
+        function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
-      }
-  
-      // Apply background color from the query parameter if provided
-      const bgColor = getQueryParam('bgColor');
-      if (bgColor) {
-        document.body.style.backgroundColor = bgColor;
-      }
-    </script>
-  </div>
-</body>
-<script type='text/javascript' id='leadin-script-loader-js-js-extra'>
-/* <![CDATA[ */
-var leadin_wordpress = {"userRole":"visitor","pageType":"home","leadinPluginVersion":"10.0.25"};
-/* ]]> */
-</script>
-<script type='text/javascript' src='https://js.hs-scripts.com/22795427.js?integration=WordPress&#038;ver=10.0.25' async defer id='hs-script-loader'></script>
+        }
 
+        // Apply background color from the query parameter if provided
+        const bgColor = getQueryParam('bgColor');
+        if (bgColor) {
+        document.body.style.backgroundColor = bgColor;
+        }
+    </script>
+</div>
+
+</body>
 </html>
